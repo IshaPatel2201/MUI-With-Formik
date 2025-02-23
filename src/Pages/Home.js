@@ -1,6 +1,17 @@
-import { Button, TextField, Typography,DialogTitle,Dialog,DialogContent,Autocomplete, Checkbox, FormGroup, Radio, FormControlLabel, FormControl, FormLabel, RadioGroup, TableCell, TableBody, TableContainer, Paper, Table, TableHead, TableRow, Stack, } from '@mui/material';
+import { Button, TextField, Typography, DialogTitle, Dialog, DialogContent, Autocomplete, Checkbox, FormGroup, Radio, FormControlLabel, FormControl, FormLabel, RadioGroup, TableCell, TableBody, TableContainer, Paper, Table, TableHead, TableRow, Stack, } from '@mui/material';
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
+import * as Yup from 'yup';
+import { useFormik } from 'formik';
+
+const validationSchema = Yup.object({
+    name: Yup.string().required("Name is required"),
+    address: Yup.string().required("Address is required"),
+    select: Yup.string().required("City selection is required"),
+    radio: Yup.string().required("Please select a Gender"),
+    check: Yup.array().min(1, "Please select at least one Language"),
+});
+
 
 const Home = () => {
     const navigate = useNavigate()
@@ -9,6 +20,24 @@ const Home = () => {
         localStorage.removeItem("loggeduser");
         navigate("/login")
     }
+
+    const formik = useFormik({
+        initialValues: { name: "", address: "", select: "", check: [], radio: "" },
+        validationSchema,
+        onSubmit: (values) => {
+            if (editIndex !== null) {
+                const updatedData = userData.map((item, index) => index === editIndex ? values : item);
+                setUserData(updatedData);
+                setEditIndex(null);
+            } else {
+                setUserData([...userData, values]);
+            }
+            setShowForm(false);
+            formik.resetForm();
+        }
+    });
+
+
 
     const [showForm, setShowForm] = useState(false);
     const [editIndex, setEditIndex] = useState(null);
@@ -41,63 +70,67 @@ const Home = () => {
     };
 
 
-    const validateForm = () => {
-        let errors = {};
-        if (!formdata.name.trim()) errors.name = "Name is required";
-        if (!formdata.address.trim()) errors.address = "Address is required";
-        if (!formdata.select) errors.select = "city selection is required";
-        if (!formdata.radio) errors.radio = "Please select the Gender";
-        if (!formdata.check) errors.check = "Please select at least one Language";
+    // const validateForm = () => {
+    //     let errors = {};
+    //     if (!formdata.name.trim()) errors.name = "Name is required";
+    //     if (!formdata.address.trim()) errors.address = "Address is required";
+    //     if (!formdata.select) errors.select = "city selection is required";
+    //     if (!formdata.radio) errors.radio = "Please select the Gender";
+    //     if (!formdata.check) errors.check = "Please select at least one Language";
 
-        setErrors(errors);
-        return Object.keys(errors).length === 0;
-    };
+    //     setErrors(errors);
+    //     return Object.keys(errors).length === 0;
+    // };
     // console.log("formdata",formdata)
 
 
-    const formdataSubmit = (e) => {
-        e.preventDefault();
-        console.log("first", e.target.value)
+    // const formdataSubmit = (e) => {
+    //     e.preventDefault();
+    //     console.log("first", e.target.value)
 
-        if (!validateForm()) return;
-        if (editIndex !== null) {
-            const updatedData = userData.map((item, index) =>
-                index === editIndex ? formdata : item
-            );
-            setUserData(updatedData);
-            setEditIndex(null);
-        }
-        else {
+    //     if (!validateForm()) return;
+    //     if (editIndex !== null) {
+    //         const updatedData = userData.map((item, index) =>
+    //             index === editIndex ? formdata : item
+    //         );
+    //         setUserData(updatedData);
+    //         setEditIndex(null);
+    //     }
+    //     else {
 
-            console.log("data", formdata)
-            setUserData([...userData, formdata])
-        }
-        setShowForm(false);
-        setFormdata({ name: "", address: "", select: "", check: [], radio: "" });
-    }
+    //         console.log("data", formdata)
+    //         setUserData([...userData, formdata])
+    //     }
+    //     setShowForm(false);
+    //     setFormdata({ name: "", address: "", select: "", check: [], radio: "" });
+    // }
 
-    useEffect(() => {
-        console.log("userData", userData)
-    }, [userData]);
+    // useEffect(() => {
+    //     console.log("userData", userData)
+    // }, [userData]);
 
     const handleDelete = (id) => {
         // console.log("dlete",id);
-        const filterData = userData.filter((item, i) => (
+        // const filterData = userData.filter((item, i) => (
+        //     i != id
+        // ))
+        setUserData(userData.filter((item, i) => (
             i != id
-        ))
-        setUserData(filterData)
+        )))
+        // setUserData(filterData)
     }
 
     const handelEdit = (item, index) => {
         // console.log("item",item);
         // console.log("index",index)
-        setFormdata({
-            name: item.name,
-            address: item.address,
-            select: item.select,
-            check: item.check || [],  // Ensure checkboxes are stored as an array
-            radio: item.radio,
-        });
+        // setFormdata({
+        //     name: item.name,
+        //     address: item.address,
+        //     select: item.select,
+        //     check: item.check || [],  // Ensure checkboxes are stored as an array
+        //     radio: item.radio,
+        // });
+        formik.setValues(item);
         setEditIndex(index);
         setShowForm(true);
 
@@ -113,13 +146,13 @@ const Home = () => {
 
 
     const city = () => [
-        { label: 'Surat', year: 1994 },
-        { label: 'Ahemdabad', year: 1972 },
-        { label: 'Vadodara', year: 1974 },
-        { label: 'Mumbai', year: 2008 },
-        { label: 'Bangalore', year: 1957 },
-        { label: "Gandhinagar", year: 1993 },
-        { label: 'Pune', year: 1994 },
+        { label: 'Surat' },
+        { label: 'Ahemdabad' },
+        { label: 'Vadodara' },
+        { label: 'Mumbai' },
+        { label: 'Bangalore' },
+        { label: "Gandhinagar" },
+        { label: 'Pune' },
     ];
 
 
@@ -134,68 +167,74 @@ const Home = () => {
                     variant='contained'
                     // type="submit"
                     onClick={() => setShowForm(true)}>Add User</Button>
-                    </Stack>
+            </Stack>
             {/* </Typography> */}
 
             <Dialog open={showForm} onClose={() => setShowForm(false)} fullWidth maxWidth="sm">
                 <DialogTitle>{editIndex !== null ? "Edit User" : "New User"}</DialogTitle>
                 <DialogContent>
 
-                <form >
-                    <Typography component='h2'>
-                        Employee Form
-                    </Typography>
+                    <form onSubmit={formik.handleSubmit} >
+                        <Typography component='h2'>
+                            Employee Form
+                        </Typography>
 
-                    <Typography component="div">
-                        <TextField
-                        fullWidth
-                            type="text"
-                            name='name'
-                            label='Name'
-                            placeholder='Enter the name'
-                            margin="dense"
-                            value={formdata.name}
-                            onChange={handelChange}
-                        />
-                        {errors.name && <p className="text-danger">{errors.name}</p>}
-                    </Typography>
-                    <Typography>
-                        <TextField
-                        fullWidth
-                            margin="dense"
-                            name='address'
-                            label='Address'
-                            placeholder='123,acbsocity'
-                            multiline
-                            rows={3}
-                            maxRows={5}
-                            value={formdata.address}
-                            onChange={handelChange}>
+                        <Typography component="div">
+                            <TextField
+                                fullWidth
+                                // type="text"
+                                name='name'
+                                label='Name'
+                                placeholder='Enter the name'
+                                margin="dense"
+                                value={formik.values.name}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                error={formik.touched.name && Boolean(formik.errors.name)}
+                                helperText={formik.touched.name && formik.errors.name}
+                            />
+                        </Typography>
+                        <Typography>
+                            <TextField
+                                fullWidth
+                                margin="dense"
+                                name='address'
+                                label='Address'
+                                placeholder='123,acbsocity'
+                                multiline
+                                rows={3}
+                                maxRows={5}
+                                value={formik.values.address}
+                                // onChange={handelChange}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                error={formik.touched.address && Boolean(formik.errors.address)}
+                                helperText={formik.touched.address && formik.errors.address}
+                            />
+                        </Typography>
 
-                        </TextField>
-                        {errors.address && <p className="text-danger">{errors.address}</p>}
-                    </Typography>
+                        <Typography component="div">
+                            <Autocomplete
+                                fullWidth
+                                name='select'
 
-                    <Typography component="div">
-                        <Autocomplete
-                        fullWidth
-                            name='select'
+                                // onChange={handelChange}
+                                placeholder='Select the City'
+                                margin="dense"
 
-                            // onChange={handelChange}
-                            placeholder='Select the City'
-                            margin="dense"
-
-                            options={city()}
-                            getOptionLabel={(option) => option.label}
-                            value={city().find((c) => c.label === formdata.select) || null}
-                            onChange={(event, newValue) => {
-                                setFormdata({ ...formdata, select: newValue ? newValue.label : "" });
-                            }}
-                            renderInput={(params) => <TextField {...params} label="City" />}
-                        >
-                        </Autocomplete>
-                        {errors.select && <p className="text-danger">{errors.select}</p>}
-
+                                options={city()}
+                                getOptionLabel={(option) => option.label}
+                                value={city().find((c) => c.label === formik.values.select) || null}
+                                // onChange={(event, newValue) => {
+                                //     setFormdata({ ...formdata, select: newValue ? newValue.label : "" });
+                                // }}
+                                onChange={(e, newValue) => formik.setFieldValue("select", newValue ? newValue.label : "")}
+                                renderInput={(params) => <TextField {...params} label="City"
+                                    error={formik.touched.select && Boolean(formik.errors.select)}
+                                    helperText={formik.touched.select && formik.errors.select} />}
+                            />
+                        </Typography>
+                        <Typography>
                         <FormGroup>
                             <FormLabel>
                                 Language
@@ -204,9 +243,10 @@ const Home = () => {
                                 control={<Checkbox />}
                                 label="JavaScript"
                                 value="JavaScript"
-                                checked={formdata.check.includes("JavaScript")}
+                                checked={formik.values.check.includes("JavaScript")}
                                 name="check"
-                                onChange={handelChange}
+                                // onChange={handelChange}
+                                onChange={formik.handleChange}
                             />
                         </FormGroup>
 
@@ -216,9 +256,10 @@ const Home = () => {
                                 control={<Checkbox />}
                                 label="React JS"
                                 value="React JS"
-                                checked={formdata.check.includes("React JS")}
+                                checked={formik.values.check.includes("React JS")}
                                 name="check"
-                                onChange={handelChange}
+                                // onChange={handelChange}
+                                onChange={formik.handleChange}
                             />
                         </FormGroup>
                         <FormGroup>
@@ -226,9 +267,10 @@ const Home = () => {
                                 control={<Checkbox />}
                                 label="Python"
                                 value="Python"
-                                checked={formdata.check.includes("Python")}
+                                checked={formik.values.check.includes("Python")}
                                 name="check"
-                                onChange={handelChange}
+                                // onChange={handelChange}
+                                onChange={formik.handleChange}
                             />
                         </FormGroup>
                         <FormGroup>
@@ -236,9 +278,10 @@ const Home = () => {
                                 control={<Checkbox />}
                                 label="Cyber Security"
                                 value="Cyber Security"
-                                checked={formdata.check.includes("Cyber Security")}
+                                checked={formik.values.check.includes("Cyber Security")}
                                 name="check"
-                                onChange={handelChange}
+                                // onChange={handelChange}
+                                onChange={formik.handleChange}
                             />
                         </FormGroup>
                         <FormGroup>
@@ -246,14 +289,14 @@ const Home = () => {
                                 control={<Checkbox />}
                                 label="UI/UX"
                                 value="UI/UX"
-                                checked={formdata.check.includes("UI/UX")}
+                                checked={formik.values.check.includes("UI/UX")}
                                 name="check"
-                                onChange={handelChange}
+                                // onChange={handelChange}
+                                onChange={formik.handleChange}
                             />
                         </FormGroup>
 
-
-                        {errors.select && <p className="text-danger">{errors.select}</p>}
+                        {formik.touched.check && formik.errors.check && <Typography color="error">{formik.errors.check}</Typography>}
                     </Typography>
 
                     <Typography component="div">
@@ -268,50 +311,57 @@ const Home = () => {
                                     aria-labelledby="demo-controlled-radio-buttons-group"
                                     value="Female"
                                     name="radio"
-                                    control={<Radio />} label="Female"
-                                    checked={formdata.radio === "Female"} onChange={handelChange}
+                                    control={<Radio />}
+                                    label="Female"
+                                    // checked={formdata.radio === "Female"}
+                                    checked={formik.values.radio === "Female"}
+                                    //  onChange={handelChange}
+                                    onChange={formik.handleChange}
 
                                 />
                                 <FormControlLabel
                                     aria-labelledby="demo-controlled-radio-buttons-group"
                                     value="Male"
-                                    checked={formdata.radio === "Male"}
+                                    checked={formik.values.radio === "Male"}
                                     name="radio"
-                                    control={<Radio />} label="Male"
-                                    onChange={handelChange}
+                                    control={<Radio />}
+                                    label="Male"
+                                    // onChange={handelChange}
+                                    onChange={formik.handleChange}
                                 />
                             </RadioGroup>
                         </FormControl>
-
-                        {errors.radio && <p className="text-danger">{errors.radio}</p>}
+                        {formik.touched.radio && formik.errors.radio && <Typography color="error">{formik.errors.radio}</Typography>}
+                        {/* {errors.radio && <p className="text-danger">{errors.radio}</p>} */}
                     </Typography>
                     <Typography component="div">
                         <Button
                             variant='contained'
                             //  class="btn btn-primary" 
                             type='submit'
-                            onClick={formdataSubmit}>
+                        // onClick={formdataSubmit}
+                        >
                             {editIndex !== null ? "Update" : "Submit"}
                         </Button>
                     </Typography>
                 </form>
-                </DialogContent>
-                </Dialog>
-        
-        <Stack direction="row" justifyContent="end">
+            </DialogContent>
+        </Dialog >
 
-            <Button
-            variant='contained'
-                onClick={handleLogout}
-                sx={{
-                }}
-            // type='submit'
-            // class='btn btn-success btn-block btn-lg gradient-custom-4 text-body center' 
-            >
-                Logout
-            </Button>
-        </Stack>
-            {/* <button
+            <Stack direction="row" justifyContent="end">
+
+                <Button
+                    variant='contained'
+                    onClick={handleLogout}
+                    sx={{
+                    }}
+                // type='submit'
+                // class='btn btn-success btn-block btn-lg gradient-custom-4 text-body center' 
+                >
+                    Logout
+                </Button>
+            </Stack>
+    {/* <button
                                    onClick={handleContect}
                                     type='submit'
                                     class='btn btn-success btn-block btn-lg gradient-custom-4 text-body center' 
@@ -319,9 +369,9 @@ const Home = () => {
                                         Contect
                                     </button> */}
 
-            {/* </div> */}
-            <section>
-                {/* <div className='mask d-flex align-item-center h-100 gradient-custom-3'>
+    {/* </div> */ }
+    <section>
+        {/* <div className='mask d-flex align-item-center h-100 gradient-custom-3'>
                 <div className='container h-100'>
                     <div className='row d-flex justify-content-center align-items-center h-100'>
                         <div className='col-12 col-md-9 col-lg-7 col-xl-6'>
@@ -353,13 +403,14 @@ const Home = () => {
                     </div>
                 </div>
             </div> */}
-            </section>
+    </section>
 
 
-{!showForm&&(
+    {
+        !showForm && (
 
 
-            <TableContainer component={Paper} sx={{mt:4}}>
+            <TableContainer component={Paper} sx={{ mt: 4 }}>
                 <Table>
                     <TableHead>
                         <TableRow>
@@ -383,9 +434,9 @@ const Home = () => {
                                         <TableCell>{item.check.join(",")}</TableCell>
                                         <TableCell>{item.radio}</TableCell>
                                         <TableCell>
-                                        <Stack direction="row" spacing={1}>
-                                            <Button className='btn btn-info mx-3' onClick={() => handelEdit(item, i)}>Edit</Button>
-                                            <Button className='btn btn-info' onClick={() => handleDelete(i)}>Delete</Button>
+                                            <Stack direction="row" spacing={1}>
+                                                <Button className='btn btn-info mx-3' onClick={() => handelEdit(item, i)}>Edit</Button>
+                                                <Button className='btn btn-info' onClick={() => handleDelete(i)}>Delete</Button>
                                             </Stack>
                                         </TableCell>
 
@@ -396,7 +447,8 @@ const Home = () => {
                     </TableBody>
                 </Table>
             </TableContainer>
-)}
+        )
+    }
         </>
     )
 }

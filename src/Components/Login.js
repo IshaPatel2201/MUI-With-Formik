@@ -83,7 +83,7 @@ const Login = () => {
                         <Typography variant="h3" sx={{textTransform: "uppercase" }}>
                             Login
                         </Typography>
-                        <form onSubmit={handleLogin}>
+                        <form onSubmit={formik.handleSubmit}>
                             <Typography component="div"
                             // className='form-outline mb-4'
                             >
@@ -91,14 +91,18 @@ const Login = () => {
                                     label="Email"
                                     name='email'
                                     margin="dense"
-                                    required
-                                    value={input.email}
-                                    onChange={(e) => setInput({
-                                        ...input, [e.target.name]: e.target.value,
-                                    })}
-                                    type='email'
+                                    // required
                                     variant="outlined"
-                                    id='form3Example3cg'
+                                    value={formik.values.email}
+                                    // onChange={(e) => setInput({
+                                    //     ...input, [e.target.name]: e.target.value,
+                                    // })}
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    error={formik.touched.email && Boolean(formik.errors.email)}
+                                    helperText={formik.touched.email && formik.errors.email}
+                                    // type='email'
+                                    // id='form3Example3cg'
                                     // className='form-control form-control-lg'
                                 />
                                 {/* <label className='form-label' htmlFor='form3Example3cg'>Your Email</label> */}
