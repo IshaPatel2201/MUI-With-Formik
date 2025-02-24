@@ -1,4 +1,4 @@
-import { Button, TextField, Typography,Card,Box } from '@mui/material';
+import { Button, TextField, Typography,Card,Box,Snackbar, Alert } from '@mui/material';
 import React, { useState } from 'react'
 // import React from 'react'
 import { useNavigate, Link } from 'react-router-dom';
@@ -25,11 +25,12 @@ const validationSchema = Yup.object({
 const Register = () => {
 
     const navigate = useNavigate();
-    const [input, setInput] = useState({
-        name: "",
-        email: "",
-        password: "",
-    });
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    // const [input, setInput] = useState({
+    //     name: "",
+    //     email: "",
+    //     password: "",
+    // });
 
 
     const formik = useFormik({
@@ -41,7 +42,9 @@ const Register = () => {
         validationSchema,
         onSubmit:(values)=>{
             localStorage.setItem('user', JSON.stringify(values));
-            navigate("/login");
+            setOpenSnackbar(true);
+            setTimeout(() => navigate("/login"), 2000); 
+            // navigate("/login");
         },
     });
     
@@ -60,7 +63,10 @@ const Register = () => {
                         display: "flex",
                         justifyContent: "center",
                         alignItems: "center",
-                        height: "100vh", // Full viewport height
+                        height: "100vh",
+                        backgroundImage:"url('/images/background.jpg')",
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
                     }}
                 >
                 <Card  sx={{ maxWidth: 300, p: 2 }}>
@@ -174,6 +180,11 @@ const Register = () => {
 
             </Card>
             </Box>
+            <Snackbar open={openSnackbar} autoHideDuration={3000} onClose={() => setOpenSnackbar(false)}>
+                    <Alert onClose={() => setOpenSnackbar(false)} severity="success" sx={{ width: '100%' }}>
+                        Registration successful Done! 
+                    </Alert>
+                </Snackbar>
             </section>
         </>
     )

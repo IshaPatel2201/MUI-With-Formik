@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom';
-import { TextField, Button, Typography, Card, Box } from "@mui/material"
+import { TextField, Button, Typography, Card, Box ,Snackbar,Alert} from "@mui/material"
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
 
@@ -20,6 +20,9 @@ const validationSchema = Yup.object({
 
 const Login = () => {
     const navigate = useNavigate()
+    const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertSeverity, setAlertSeverity] = useState("error");
     const [input, setInput] = useState({
         email: "",
         password: "",
@@ -38,10 +41,19 @@ const Login = () => {
 
             if (values.email == loggeduser.email && values.password == loggeduser.password) {
                 localStorage.setItem("loggeduser", true)
-                navigate("/")
+                setAlertSeverity("success");
+                setAlertMessage("You are Login successful!");
+                setAlertOpen(true);
+                setTimeout(()=>{
+                    
+                    navigate("/");
+                },1500);
             }
             else {
-                alert("wrong Email or Password")
+                // alert("wrong Email or Password")
+                setAlertSeverity("error");
+                setAlertMessage("Wrong Email or Password!");
+                setAlertOpen(true);
             } 
         },
     });
@@ -68,7 +80,9 @@ const Login = () => {
                         justifyContent: "center",
                         alignItems: "center",
                         height: "100vh", // Full viewport height
-                        backgroundImage:"url('D:\Webito\ex-mui\mui\src\Components\pexels-jplenio-1103970.jpg')"
+                        backgroundImage:"url('/images/background.jpg')",
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
                     }}
                 >
                     {/* <div className='mask d-flex align-item-center h-100 gradient-custom-3'>
@@ -113,17 +127,21 @@ const Login = () => {
                             //  className='form-outline mb-4'
                             >
                                 <TextField
-                                    required
+                                    // required
                                     margin="dense"
                                     label="Password"
                                     variant="outlined"
                                     name='password'
-                                    value={input.password}
-                                    onChange={(e) => setInput({
-                                        ...input, [e.target.name]: e.target.value,
-                                    })}
-                                    type='Password'
-                                    id='form3Example4cg'
+                                    value={formik.values.password}
+                                    onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        error={formik.touched.password && Boolean(formik.errors.password)}
+                        helperText={formik.touched.password && formik.errors.password}
+                                    // onChange={(e) => setInput({
+                                    //     ...input, [e.target.name]: e.target.value,
+                                    // })}
+                                    // type='Password'
+                                    // id='form3Example4cg'
                                 // className='form-control form-control-lg'
                                 />
                                 {/* <label className='form-label' htmlFor='form3Example4cg'>Password</label> */}
@@ -164,6 +182,17 @@ const Login = () => {
             </div> */}
                     </Card>
                 </Box>
+
+                <Snackbar
+          open={alertOpen}
+          autoHideDuration={3000}
+          onClose={() => setAlertOpen(false)}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        >
+          <Alert onClose={() => setAlertOpen(false)} severity={alertSeverity} sx={{ width: "100%" }}>
+            {alertMessage}
+          </Alert>
+        </Snackbar>
             </section>
         </>
     )

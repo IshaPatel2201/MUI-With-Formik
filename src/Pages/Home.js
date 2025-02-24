@@ -1,4 +1,4 @@
-import { Button, TextField, Typography, DialogTitle, Dialog, DialogContent, Autocomplete, Checkbox, FormGroup, Radio, FormControlLabel, FormControl, FormLabel, RadioGroup, TableCell, TableBody, TableContainer, Paper, Table, TableHead, TableRow, Stack, } from '@mui/material';
+import { Button, TextField, Typography,Snackbar, Alert,DialogTitle, Dialog, DialogContent, Autocomplete, Checkbox, FormGroup, Radio, FormControlLabel, FormControl, FormLabel, RadioGroup, TableCell, TableBody, TableContainer, Paper, Table, TableHead, TableRow, Stack, } from '@mui/material';
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
@@ -13,6 +13,8 @@ const validationSchema = Yup.object({
 });
 
 
+
+
 const Home = () => {
     const navigate = useNavigate()
     const userName = JSON.parse(localStorage.getItem("user"));
@@ -20,6 +22,19 @@ const Home = () => {
         localStorage.removeItem("loggeduser");
         navigate("/login")
     }
+
+    const [alertOpen, setAlertOpen] = useState(false);
+    const [alertMessage, setAlertMessage] = useState("");
+    const [alertSeverity, setAlertSeverity] = useState("success");
+
+
+
+    const showAlert = (message, severity = "success") => {
+        setAlertMessage(message);
+        setAlertSeverity(severity);
+        setAlertOpen(true);
+    };
+
 
     const formik = useFormik({
         initialValues: { name: "", address: "", select: "", check: [], radio: "" },
@@ -29,8 +44,10 @@ const Home = () => {
                 const updatedData = userData.map((item, index) => index === editIndex ? values : item);
                 setUserData(updatedData);
                 setEditIndex(null);
+                showAlert("User data updated successfully!", "info");
             } else {
                 setUserData([...userData, values]);
+                showAlert("User added successfully!", "success");
             }
             setShowForm(false);
             formik.resetForm();
@@ -53,21 +70,21 @@ const Home = () => {
     const [errors, setErrors] = useState({});
     const [userData, setUserData] = useState([]);
 
-    const handelChange = (e) => {
-        const { name, value, type, checked } = e.target;
+    // const handelChange = (e) => {
+    //     const { name, value, type, checked } = e.target;
 
-        if (type === "checkbox") {
-            setFormdata((prev) => ({
-                ...prev,
-                check: checked
-                    ? [...prev.check, value]  // Add selected checkbox to array
-                    : prev.check.filter((item) => item !== value),  // Remove unchecked item
-            }));
-        } else {
-            // console.log("e",e.target.value);
-            setFormdata({ ...formdata, [e.target.name]: e.target.value })
-        }
-    };
+    //     if (type === "checkbox") {
+    //         setFormdata((prev) => ({
+    //             ...prev,
+    //             check: checked
+    //                 ? [...prev.check, value]  // Add selected checkbox to array
+    //                 : prev.check.filter((item) => item !== value),  // Remove unchecked item
+    //         }));
+    //     } else {
+    //         // console.log("e",e.target.value);
+    //         setFormdata({ ...formdata, [e.target.name]: e.target.value })
+    //     }
+    // };
 
 
     // const validateForm = () => {
@@ -110,13 +127,15 @@ const Home = () => {
     // }, [userData]);
 
     const handleDelete = (id) => {
+        setUserData(userData.filter((item, i) => (
+            i != id
+            
+        )))
+        showAlert("User deleted successfully!", "error");
         // console.log("dlete",id);
         // const filterData = userData.filter((item, i) => (
         //     i != id
         // ))
-        setUserData(userData.filter((item, i) => (
-            i != id
-        )))
         // setUserData(filterData)
     }
 
@@ -156,17 +175,34 @@ const Home = () => {
     ];
 
 
+  
     return (
         <>
+    
+
 
 
             {/* <Typography component="div"> */}
-            <Stack direction="row" justifyContent="end">
+            <Stack direction="row" justifyContent="space-between" sx={{ mt:3 }} >
                 <Button
                     // margin="dense"
                     variant='contained'
                     // type="submit"
                     onClick={() => setShowForm(true)}>Add User</Button>
+
+
+
+                    
+<Button
+    variant='contained'
+    onClick={handleLogout}
+    sx={{
+    }}
+// type='submit'
+// class='btn btn-success btn-block btn-lg gradient-custom-4 text-body center' 
+>
+    Logout
+</Button>
             </Stack>
             {/* </Typography> */}
 
@@ -348,19 +384,7 @@ const Home = () => {
             </DialogContent>
         </Dialog >
 
-            <Stack direction="row" justifyContent="end">
-
-                <Button
-                    variant='contained'
-                    onClick={handleLogout}
-                    sx={{
-                    }}
-                // type='submit'
-                // class='btn btn-success btn-block btn-lg gradient-custom-4 text-body center' 
-                >
-                    Logout
-                </Button>
-            </Stack>
+           
     {/* <button
                                    onClick={handleContect}
                                     type='submit'
@@ -449,6 +473,17 @@ const Home = () => {
             </TableContainer>
         )
     }
+
+<Snackbar
+                open={alertOpen}
+                autoHideDuration={3000}
+                onClose={() => setAlertOpen(false)}
+                anchorOrigin={{ vertical: "top", horizontal: "center" }}
+            >
+                <Alert onClose={() => setAlertOpen(false)} severity={alertSeverity} variant="filled">
+                    {alertMessage}
+                </Alert>
+            </Snackbar>
         </>
     )
 }
