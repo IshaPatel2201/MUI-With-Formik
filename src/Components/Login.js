@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom';
-import { TextField, Button, Typography, Card, Box ,Snackbar,Alert} from "@mui/material"
+import { TextField, Button, Typography, Card, Box, Snackbar, Alert,IconButton, InputAdornment } from "@mui/material"
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 
 
@@ -20,23 +21,24 @@ const validationSchema = Yup.object({
 
 const Login = () => {
     const navigate = useNavigate()
+    const [showPassword, setShowPassword] = useState(false);
     const [alertOpen, setAlertOpen] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
-  const [alertSeverity, setAlertSeverity] = useState("error");
+    const [alertMessage, setAlertMessage] = useState("");
+    const [alertSeverity, setAlertSeverity] = useState("error");
     const [input, setInput] = useState({
         email: "",
         password: "",
     });
 
 
-    
+
     const formik = useFormik({
         initialValues: {
             email: "",
             password: "",
         },
         validationSchema,
-        onSubmit:(values)=>{
+        onSubmit: (values) => {
             const loggeduser = JSON.parse(localStorage.getItem("user"));
 
             if (values.email == loggeduser.email && values.password == loggeduser.password) {
@@ -44,17 +46,17 @@ const Login = () => {
                 setAlertSeverity("success");
                 setAlertMessage("You are Login successful!");
                 setAlertOpen(true);
-                setTimeout(()=>{
-                    
+                setTimeout(() => {
+
                     navigate("/");
-                },1500);
+                }, 1500);
             }
             else {
                 // alert("wrong Email or Password")
                 setAlertSeverity("error");
                 setAlertMessage("Wrong Email or Password!");
                 setAlertOpen(true);
-            } 
+            }
         },
     });
 
@@ -79,8 +81,8 @@ const Login = () => {
                         display: "flex",
                         justifyContent: "center",
                         alignItems: "center",
-                        height: "100vh", // Full viewport height
-                        backgroundImage:"url('/images/background.jpg')",
+                        height: "100vh",
+                        backgroundImage: "url('/images/background.jpg')",
                         backgroundSize: "cover",
                         backgroundPosition: "center",
                     }}
@@ -94,7 +96,7 @@ const Login = () => {
                     <Card
                         sx={{ maxWidth: 300, p: 2 }}
                     >
-                        <Typography variant="h3" sx={{textTransform: "uppercase" }}>
+                        <Typography variant="h3" sx={{ textTransform: "uppercase" }}>
                             Login
                         </Typography>
                         <form onSubmit={formik.handleSubmit}>
@@ -103,6 +105,7 @@ const Login = () => {
                             >
                                 <TextField
                                     label="Email"
+                                    fullWidth
                                     name='email'
                                     margin="dense"
                                     // required
@@ -115,9 +118,9 @@ const Login = () => {
                                     onBlur={formik.handleBlur}
                                     error={formik.touched.email && Boolean(formik.errors.email)}
                                     helperText={formik.touched.email && formik.errors.email}
-                                    // type='email'
-                                    // id='form3Example3cg'
-                                    // className='form-control form-control-lg'
+                                // type='email'
+                                // id='form3Example3cg'
+                                // className='form-control form-control-lg'
                                 />
                                 {/* <label className='form-label' htmlFor='form3Example3cg'>Your Email</label> */}
                             </Typography>
@@ -128,20 +131,32 @@ const Login = () => {
                             >
                                 <TextField
                                     // required
+                                    fullWidth
+                                     type={showPassword ? "text" : "password"}
                                     margin="dense"
                                     label="Password"
                                     variant="outlined"
                                     name='password'
                                     value={formik.values.password}
                                     onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        error={formik.touched.password && Boolean(formik.errors.password)}
-                        helperText={formik.touched.password && formik.errors.password}
-                                    // onChange={(e) => setInput({
-                                    //     ...input, [e.target.name]: e.target.value,
-                                    // })}
-                                    // type='Password'
-                                    // id='form3Example4cg'
+                                    onBlur={formik.handleBlur}
+                                    error={formik.touched.password && Boolean(formik.errors.password)}
+                                    helperText={formik.touched.password && formik.errors.password}
+
+                                    InputProps={{
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                                                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                                                </IconButton>
+                                            </InputAdornment>
+                                        ),
+                                    }}
+                                // onChange={(e) => setInput({
+                                //     ...input, [e.target.name]: e.target.value,
+                                // })}
+                                // type='Password'
+                                // id='form3Example4cg'
                                 // className='form-control form-control-lg'
                                 />
                                 {/* <label className='form-label' htmlFor='form3Example4cg'>Password</label> */}
@@ -184,15 +199,15 @@ const Login = () => {
                 </Box>
 
                 <Snackbar
-          open={alertOpen}
-          autoHideDuration={3000}
-          onClose={() => setAlertOpen(false)}
-          anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        >
-          <Alert onClose={() => setAlertOpen(false)} severity={alertSeverity} sx={{ width: "100%" }}>
-            {alertMessage}
-          </Alert>
-        </Snackbar>
+                    open={alertOpen}
+                    autoHideDuration={3000}
+                    onClose={() => setAlertOpen(false)}
+                    anchorOrigin={{ vertical: "top", horizontal: "center" }}
+                >
+                    <Alert onClose={() => setAlertOpen(false)} severity={alertSeverity} sx={{ width: "100%" }}>
+                        {alertMessage}
+                    </Alert>
+                </Snackbar>
             </section>
         </>
     )

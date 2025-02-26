@@ -1,8 +1,12 @@
-import { Button, TextField, Typography,Snackbar, Alert,DialogTitle, Dialog, DialogContent, Autocomplete, Checkbox, FormGroup, Radio, FormControlLabel, FormControl, FormLabel, RadioGroup, TableCell, TableBody, TableContainer, Paper, Table, TableHead, TableRow, Stack, } from '@mui/material';
+import { Button, TextField, Typography, DialogActions,Snackbar, Alert, DialogTitle, Dialog, DialogContent, Autocomplete, Checkbox, FormGroup, Avatar,Radio, FormControlLabel, FormControl, FormLabel, RadioGroup, TableCell, TableBody, TableContainer, Paper, Table, TableHead, TableRow, Stack, } from '@mui/material';
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
+// import { Dropdown } from '@mui/base/Dropdown';
+// import { MenuItem as BaseMenuItem, menuItemClasses } from '@mui/base/MenuItem';
+// import { Menu, MenuListboxSlotProps } from '@mui/base/Menu';
+// import { MenuButton as BaseMenuButton } from '@mui/base/MenuButton';
 
 const validationSchema = Yup.object({
     name: Yup.string().required("Name is required"),
@@ -69,6 +73,8 @@ const Home = () => {
 
     const [errors, setErrors] = useState({});
     const [userData, setUserData] = useState([]);
+    const [deleteIndex, setDeleteIndex] = useState(null);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
     // const handelChange = (e) => {
     //     const { name, value, type, checked } = e.target;
@@ -126,11 +132,19 @@ const Home = () => {
     //     console.log("userData", userData)
     // }, [userData]);
 
+
+    const confirmDelete = (index) => {
+        setDeleteIndex(index);
+        setDeleteDialogOpen(true);
+    };
+
     const handleDelete = (id) => {
         setUserData(userData.filter((item, i) => (
-            i != id
-            
+            // i != id
+            i!==deleteIndex
         )))
+        setDeleteIndex(null);
+        setDeleteDialogOpen(false);
         showAlert("User deleted successfully!", "error");
         // console.log("dlete",id);
         // const filterData = userData.filter((item, i) => (
@@ -175,15 +189,17 @@ const Home = () => {
     ];
 
 
-  
+
     return (
         <>
-    
+
 
 
 
             {/* <Typography component="div"> */}
-            <Stack direction="row" justifyContent="space-between" sx={{ mt:3 }} >
+
+
+            <Stack direction="row" justifyContent="space-between" sx={{ mt: 3 }} >
                 <Button
                     // margin="dense"
                     variant='contained'
@@ -192,17 +208,17 @@ const Home = () => {
 
 
 
-                    
-<Button
-    variant='contained'
-    onClick={handleLogout}
-    sx={{
-    }}
-// type='submit'
-// class='btn btn-success btn-block btn-lg gradient-custom-4 text-body center' 
->
-    Logout
-</Button>
+
+                <Button
+                    variant='contained'
+                    onClick={handleLogout}
+                    sx={{
+                    }}
+                // type='submit'
+                // class='btn btn-success btn-block btn-lg gradient-custom-4 text-body center' 
+                >
+                    Logout
+                </Button>
             </Stack>
             {/* </Typography> */}
 
@@ -271,121 +287,121 @@ const Home = () => {
                             />
                         </Typography>
                         <Typography>
-                        <FormGroup>
-                            <FormLabel>
-                                Language
-                            </FormLabel>
-                            <FormControlLabel
-                                control={<Checkbox />}
-                                label="JavaScript"
-                                value="JavaScript"
-                                checked={formik.values.check.includes("JavaScript")}
-                                name="check"
-                                // onChange={handelChange}
-                                onChange={formik.handleChange}
-                            />
-                        </FormGroup>
-
-
-                        <FormGroup>
-                            <FormControlLabel
-                                control={<Checkbox />}
-                                label="React JS"
-                                value="React JS"
-                                checked={formik.values.check.includes("React JS")}
-                                name="check"
-                                // onChange={handelChange}
-                                onChange={formik.handleChange}
-                            />
-                        </FormGroup>
-                        <FormGroup>
-                            <FormControlLabel
-                                control={<Checkbox />}
-                                label="Python"
-                                value="Python"
-                                checked={formik.values.check.includes("Python")}
-                                name="check"
-                                // onChange={handelChange}
-                                onChange={formik.handleChange}
-                            />
-                        </FormGroup>
-                        <FormGroup>
-                            <FormControlLabel
-                                control={<Checkbox />}
-                                label="Cyber Security"
-                                value="Cyber Security"
-                                checked={formik.values.check.includes("Cyber Security")}
-                                name="check"
-                                // onChange={handelChange}
-                                onChange={formik.handleChange}
-                            />
-                        </FormGroup>
-                        <FormGroup>
-                            <FormControlLabel
-                                control={<Checkbox />}
-                                label="UI/UX"
-                                value="UI/UX"
-                                checked={formik.values.check.includes("UI/UX")}
-                                name="check"
-                                // onChange={handelChange}
-                                onChange={formik.handleChange}
-                            />
-                        </FormGroup>
-
-                        {formik.touched.check && formik.errors.check && <Typography color="error">{formik.errors.check}</Typography>}
-                    </Typography>
-
-                    <Typography component="div">
-                        <FormControl>
-                            <FormLabel>Gender</FormLabel>
-                            <RadioGroup
-                                aria-labelledby="demo-radio-buttons-group-label"
-                                name="radio-buttons-group"
-                            >
-
+                            <FormGroup>
+                                <FormLabel>
+                                    Language
+                                </FormLabel>
                                 <FormControlLabel
-                                    aria-labelledby="demo-controlled-radio-buttons-group"
-                                    value="Female"
-                                    name="radio"
-                                    control={<Radio />}
-                                    label="Female"
-                                    // checked={formdata.radio === "Female"}
-                                    checked={formik.values.radio === "Female"}
-                                    //  onChange={handelChange}
-                                    onChange={formik.handleChange}
-
-                                />
-                                <FormControlLabel
-                                    aria-labelledby="demo-controlled-radio-buttons-group"
-                                    value="Male"
-                                    checked={formik.values.radio === "Male"}
-                                    name="radio"
-                                    control={<Radio />}
-                                    label="Male"
+                                    control={<Checkbox />}
+                                    label="JavaScript"
+                                    value="JavaScript"
+                                    checked={formik.values.check.includes("JavaScript")}
+                                    name="check"
                                     // onChange={handelChange}
                                     onChange={formik.handleChange}
                                 />
-                            </RadioGroup>
-                        </FormControl>
-                        {formik.touched.radio && formik.errors.radio && <Typography color="error">{formik.errors.radio}</Typography>}
-                        {/* {errors.radio && <p className="text-danger">{errors.radio}</p>} */}
-                    </Typography>
-                    <Typography component="div">
-                        <Button
-                            variant='contained'
-                            //  class="btn btn-primary" 
-                            type='submit'
-                        // onClick={formdataSubmit}
-                        >
-                            {editIndex !== null ? "Update" : "Submit"}
-                        </Button>
-                    </Typography>
-                </form>
-            </DialogContent>
-        </Dialog >
+                            </FormGroup>
 
-           
-    {/* <button
+
+                            <FormGroup>
+                                <FormControlLabel
+                                    control={<Checkbox />}
+                                    label="React JS"
+                                    value="React JS"
+                                    checked={formik.values.check.includes("React JS")}
+                                    name="check"
+                                    // onChange={handelChange}
+                                    onChange={formik.handleChange}
+                                />
+                            </FormGroup>
+                            <FormGroup>
+                                <FormControlLabel
+                                    control={<Checkbox />}
+                                    label="Python"
+                                    value="Python"
+                                    checked={formik.values.check.includes("Python")}
+                                    name="check"
+                                    // onChange={handelChange}
+                                    onChange={formik.handleChange}
+                                />
+                            </FormGroup>
+                            <FormGroup>
+                                <FormControlLabel
+                                    control={<Checkbox />}
+                                    label="Cyber Security"
+                                    value="Cyber Security"
+                                    checked={formik.values.check.includes("Cyber Security")}
+                                    name="check"
+                                    // onChange={handelChange}
+                                    onChange={formik.handleChange}
+                                />
+                            </FormGroup>
+                            <FormGroup>
+                                <FormControlLabel
+                                    control={<Checkbox />}
+                                    label="UI/UX"
+                                    value="UI/UX"
+                                    checked={formik.values.check.includes("UI/UX")}
+                                    name="check"
+                                    // onChange={handelChange}
+                                    onChange={formik.handleChange}
+                                />
+                            </FormGroup>
+
+                            {formik.touched.check && formik.errors.check && <Typography color="error">{formik.errors.check}</Typography>}
+                        </Typography>
+
+                        <Typography component="div">
+                            <FormControl>
+                                <FormLabel>Gender</FormLabel>
+                                <RadioGroup
+                                    aria-labelledby="demo-radio-buttons-group-label"
+                                    name="radio-buttons-group"
+                                >
+
+                                    <FormControlLabel
+                                        aria-labelledby="demo-controlled-radio-buttons-group"
+                                        value="Female"
+                                        name="radio"
+                                        control={<Radio />}
+                                        label="Female"
+                                        // checked={formdata.radio === "Female"}
+                                        checked={formik.values.radio === "Female"}
+                                        //  onChange={handelChange}
+                                        onChange={formik.handleChange}
+
+                                    />
+                                    <FormControlLabel
+                                        aria-labelledby="demo-controlled-radio-buttons-group"
+                                        value="Male"
+                                        checked={formik.values.radio === "Male"}
+                                        name="radio"
+                                        control={<Radio />}
+                                        label="Male"
+                                        // onChange={handelChange}
+                                        onChange={formik.handleChange}
+                                    />
+                                </RadioGroup>
+                            </FormControl>
+                            {formik.touched.radio && formik.errors.radio && <Typography color="error">{formik.errors.radio}</Typography>}
+                            {/* {errors.radio && <p className="text-danger">{errors.radio}</p>} */}
+                        </Typography>
+                        <Typography component="div">
+                            <Button
+                                variant='contained'
+                                //  class="btn btn-primary" 
+                                type='submit'
+                            // onClick={formdataSubmit}
+                            >
+                                {editIndex !== null ? "Update" : "Submit"}
+                            </Button>
+                        </Typography>
+                    </form>
+                </DialogContent>
+            </Dialog >
+
+
+            {/* <button
                                    onClick={handleContect}
                                     type='submit'
                                     class='btn btn-success btn-block btn-lg gradient-custom-4 text-body center' 
@@ -393,9 +409,9 @@ const Home = () => {
                                         Contect
                                     </button> */}
 
-    {/* </div> */ }
-    <section>
-        {/* <div className='mask d-flex align-item-center h-100 gradient-custom-3'>
+            {/* </div> */}
+            <section>
+                {/* <div className='mask d-flex align-item-center h-100 gradient-custom-3'>
                 <div className='container h-100'>
                     <div className='row d-flex justify-content-center align-items-center h-100'>
                         <div className='col-12 col-md-9 col-lg-7 col-xl-6'>
@@ -427,54 +443,54 @@ const Home = () => {
                     </div>
                 </div>
             </div> */}
-    </section>
+            </section>
 
 
-    {
-        !showForm && (
+            {
+                !showForm && (
 
 
-            <TableContainer component={Paper} sx={{ mt: 4 }}>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Name</TableCell>
-                            <TableCell>Address</TableCell>
-                            <TableCell>City</TableCell>
-                            <TableCell>Languages</TableCell>
-                            <TableCell>Gender</TableCell>
-                            <TableCell>Action</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {
-                            userData.map((item, i) => {
-                                return (
-                                    <TableRow key={i} >
+                    <TableContainer component={Paper} sx={{ mt: 4 }}>
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>Name</TableCell>
+                                    <TableCell>Address</TableCell>
+                                    <TableCell>City</TableCell>
+                                    <TableCell>Languages</TableCell>
+                                    <TableCell>Gender</TableCell>
+                                    <TableCell>Action</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {
+                                    userData.map((item, i) => {
+                                        return (
+                                            <TableRow key={i} >
 
-                                        <TableCell>{item.name}</TableCell>
-                                        <TableCell>{item.address}</TableCell>
-                                        <TableCell>{item.select}</TableCell>
-                                        <TableCell>{item.check.join(",")}</TableCell>
-                                        <TableCell>{item.radio}</TableCell>
-                                        <TableCell>
-                                            <Stack direction="row" spacing={1}>
-                                                <Button className='btn btn-info mx-3' onClick={() => handelEdit(item, i)}>Edit</Button>
-                                                <Button className='btn btn-info' onClick={() => handleDelete(i)}>Delete</Button>
-                                            </Stack>
-                                        </TableCell>
+                                                <TableCell>{item.name}</TableCell>
+                                                <TableCell>{item.address}</TableCell>
+                                                <TableCell>{item.select}</TableCell>
+                                                <TableCell>{item.check.join(",")}</TableCell>
+                                                <TableCell>{item.radio}</TableCell>
+                                                <TableCell>
+                                                    <Stack direction="row" spacing={1}>
+                                                        <Button className='btn btn-info mx-3' onClick={() => handelEdit(item, i)}>Edit</Button>
+                                                        <Button className='btn btn-info' onClick={() => confirmDelete(i)}>Delete</Button>
+                                                    </Stack>
+                                                </TableCell>
 
-                                    </TableRow>
-                                )
-                            })
-                        }
-                    </TableBody>
-                </Table>
-            </TableContainer>
-        )
-    }
+                                            </TableRow>
+                                        )
+                                    })
+                                }
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                )
+            }
 
-<Snackbar
+            <Snackbar
                 open={alertOpen}
                 autoHideDuration={3000}
                 onClose={() => setAlertOpen(false)}
@@ -484,6 +500,20 @@ const Home = () => {
                     {alertMessage}
                 </Alert>
             </Snackbar>
+
+
+            <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+                <DialogTitle>Confirm Deletion</DialogTitle>
+                <DialogContent>Are you sure you want to delete this user?</DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setDeleteDialogOpen(false)} color="secondary">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleDelete} color="error">
+                        Delete
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </>
     )
 }
