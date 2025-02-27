@@ -1,12 +1,13 @@
-import { Button, TextField, Typography, DialogActions,Snackbar, Alert, DialogTitle, Dialog, DialogContent, Autocomplete, Checkbox, FormGroup, Avatar,Radio, FormControlLabel, FormControl, FormLabel, RadioGroup, TableCell, TableBody, TableContainer, Paper, Table, TableHead, TableRow, Stack, } from '@mui/material';
+import {
+    Button, TextField, Typography, DialogActions, Snackbar, Alert, DialogTitle, Dialog, DialogContent, Autocomplete, Checkbox, FormGroup, Avatar, Radio, FormControlLabel, FormControl, FormLabel, RadioGroup, TableCell, TableBody, TableContainer, Paper, Table, TableHead, TableRow, Stack,
+    Menu, MenuItem, IconButton, AppBar, Toolbar, Pagination
+} from '@mui/material';
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
-// import { Dropdown } from '@mui/base/Dropdown';
-// import { MenuItem as BaseMenuItem, menuItemClasses } from '@mui/base/MenuItem';
-// import { Menu, MenuListboxSlotProps } from '@mui/base/Menu';
-// import { MenuButton as BaseMenuButton } from '@mui/base/MenuButton';
+import Sidebar from './Sidebar';
+// import Contact from './Pages/Contact'
 
 const validationSchema = Yup.object({
     name: Yup.string().required("Name is required"),
@@ -22,6 +23,18 @@ const validationSchema = Yup.object({
 const Home = () => {
     const navigate = useNavigate()
     const userName = JSON.parse(localStorage.getItem("user"));
+
+    const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
+
+    const handleMenuOpen = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
+
     const handleLogout = () => {
         localStorage.removeItem("loggeduser");
         navigate("/login")
@@ -30,7 +43,6 @@ const Home = () => {
     const [alertOpen, setAlertOpen] = useState(false);
     const [alertMessage, setAlertMessage] = useState("");
     const [alertSeverity, setAlertSeverity] = useState("success");
-
 
 
     const showAlert = (message, severity = "success") => {
@@ -71,6 +83,8 @@ const Home = () => {
 
     });
 
+
+
     const [errors, setErrors] = useState({});
     const [userData, setUserData] = useState([]);
     const [deleteIndex, setDeleteIndex] = useState(null);
@@ -90,49 +104,18 @@ const Home = () => {
     //         // console.log("e",e.target.value);
     //         setFormdata({ ...formdata, [e.target.name]: e.target.value })
     //     }
-    // };
-
-
-    // const validateForm = () => {
-    //     let errors = {};
-    //     if (!formdata.name.trim()) errors.name = "Name is required";
-    //     if (!formdata.address.trim()) errors.address = "Address is required";
-    //     if (!formdata.select) errors.select = "city selection is required";
-    //     if (!formdata.radio) errors.radio = "Please select the Gender";
-    //     if (!formdata.check) errors.check = "Please select at least one Language";
-
-    //     setErrors(errors);
-    //     return Object.keys(errors).length === 0;
-    // };
-    // console.log("formdata",formdata)
-
-
-    // const formdataSubmit = (e) => {
-    //     e.preventDefault();
-    //     console.log("first", e.target.value)
-
-    //     if (!validateForm()) return;
-    //     if (editIndex !== null) {
-    //         const updatedData = userData.map((item, index) =>
-    //             index === editIndex ? formdata : item
-    //         );
-    //         setUserData(updatedData);
-    //         setEditIndex(null);
-    //     }
-    //     else {
-
-    //         console.log("data", formdata)
-    //         setUserData([...userData, formdata])
-    //     }
-    //     setShowForm(false);
-    //     setFormdata({ name: "", address: "", select: "", check: [], radio: "" });
     // }
 
-    // useEffect(() => {
-    //     console.log("userData", userData)
-    // }, [userData]);
+    const [currentPage, setCurrentPage] = useState(1);
 
 
+    const itemsPerPage = 5;
+    const totalPages = Math.ceil(userData.length / itemsPerPage);
+    const paginatedData = userData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+    const handlePageChange = (event, value) => {
+        setCurrentPage(value);
+    };
     const confirmDelete = (index) => {
         setDeleteIndex(index);
         setDeleteDialogOpen(true);
@@ -141,7 +124,7 @@ const Home = () => {
     const handleDelete = (id) => {
         setUserData(userData.filter((item, i) => (
             // i != id
-            i!==deleteIndex
+            i !== deleteIndex
         )))
         setDeleteIndex(null);
         setDeleteDialogOpen(false);
@@ -156,13 +139,6 @@ const Home = () => {
     const handelEdit = (item, index) => {
         // console.log("item",item);
         // console.log("index",index)
-        // setFormdata({
-        //     name: item.name,
-        //     address: item.address,
-        //     select: item.select,
-        //     check: item.check || [],  // Ensure checkboxes are stored as an array
-        //     radio: item.radio,
-        // });
         formik.setValues(item);
         setEditIndex(index);
         setShowForm(true);
@@ -190,37 +166,74 @@ const Home = () => {
 
 
 
+
     return (
         <>
 
 
 
+            {/* <Contact/> */}
+            <AppBar position="static" sx={{ bgcolor: "#ba68c8" }}>
+                <Toolbar>
+                    <Typography variant="h6" sx={{ flexGrow: 1 }}>
+                        <Sidebar></Sidebar>
+                        {/* <Contact></Contact> */}
+                        Employee Dashboard
+                    </Typography>
+                    <Stack direction="row" spacing={2} alignItems="center">
+                        <IconButton onClick={handleMenuOpen}>
+                            <Avatar sx={{ bgcolor: "primary.main", color: "white" }}>
+                                {userName?.name?.charAt(0).toUpperCase()}
+                            </Avatar>
+                        </IconButton>
+                        <Button variant="contained" color="secondary" onClick={() => setShowForm(true)}>
+                            Add User
+                        </Button>
+                    </Stack>
+                </Toolbar>
+            </AppBar>
+
+            {/* Menu Dropdown */}
+            <Menu
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleMenuClose}
+                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                transformOrigin={{ vertical: "top", horizontal: "right" }}
+            >
+                <MenuItem onClick={handleLogout}>Logout</MenuItem>
+            </Menu>
+
+
 
             {/* <Typography component="div"> */}
 
+            {/* <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mt: 3 }}>
+                <Stack direction="row" alignItems="center" spacing={2}>
+                <IconButton onClick={handleMenuOpen}>
+                    <Avatar sx={{ bgcolor: "primary.main", color: "white" }}>
+                        {userName?.name?.charAt(0).toUpperCase()}
+                    </Avatar>
+                    </IconButton>
+                   
+                </Stack>
+                 <Menu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleMenuClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        transformOrigin={{ vertical: "top", horizontal: "right" }}
+    >
+        <MenuItem onClick={handleLogout}>Logout</MenuItem>
+    </Menu>
+                <Stack direction="row" spacing={2}>
+                    <Button variant="contained" onClick={() => setShowForm(true)}>Add User</Button> */}
+            {/* <Button variant="contained" color="error" onClick={handleLogout}>Logout</Button> */}
+            {/* </Stack>
+            </Stack> */}
 
-            <Stack direction="row" justifyContent="space-between" sx={{ mt: 3 }} >
-                <Button
-                    // margin="dense"
-                    variant='contained'
-                    // type="submit"
-                    onClick={() => setShowForm(true)}>Add User</Button>
 
 
-
-
-                <Button
-                    variant='contained'
-                    onClick={handleLogout}
-                    sx={{
-                    }}
-                // type='submit'
-                // class='btn btn-success btn-block btn-lg gradient-custom-4 text-body center' 
-                >
-                    Logout
-                </Button>
-            </Stack>
-            {/* </Typography> */}
 
             <Dialog open={showForm} onClose={() => setShowForm(false)} fullWidth maxWidth="sm">
                 <DialogTitle>{editIndex !== null ? "Edit User" : "New User"}</DialogTitle>
@@ -464,7 +477,8 @@ const Home = () => {
                             </TableHead>
                             <TableBody>
                                 {
-                                    userData.map((item, i) => {
+                                    // userData.map((item, i) => {
+                                    paginatedData.map((item, i) => {
                                         return (
                                             <TableRow key={i} >
 
@@ -486,9 +500,21 @@ const Home = () => {
                                 }
                             </TableBody>
                         </Table>
+                        {userData.length > itemsPerPage && (
+                            <Pagination
+                                count={totalPages}
+                                page={currentPage}
+                                onChange={handlePageChange}
+                                variant="outlined"
+                                shape="rounded"
+                                sx={{ mt: 2, display: "flex", justifyContent: "center" }}
+                            />
+                        )}
                     </TableContainer>
                 )
             }
+
+
 
             <Snackbar
                 open={alertOpen}
